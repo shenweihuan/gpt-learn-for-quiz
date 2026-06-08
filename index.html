@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ExamPilot · AI 备考学习系统 MVP</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">EP</div>
+        <div>
+          <h1>ExamPilot</h1>
+          <p>AI 备考学习系统 MVP</p>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-view="dashboard">今日计划</button>
+        <button class="nav-item" data-view="materials">资料与考点</button>
+        <button class="nav-item" data-view="cards">卡片复习</button>
+        <button class="nav-item" data-view="quiz">自测题</button>
+        <button class="nav-item" data-view="review">晚间复盘</button>
+        <button class="nav-item" data-view="settings">AI 设置</button>
+      </nav>
+
+      <div class="sidebar-card">
+        <strong>学习理论内置</strong>
+        <ul>
+          <li>主动回忆</li>
+          <li>间隔重复</li>
+          <li>费曼解释</li>
+          <li>错题归因</li>
+          <li>最小行动</li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section id="dashboard" class="view active">
+        <div class="hero">
+          <div>
+            <span class="eyebrow">短期考试模式</span>
+            <h2>把四级和期末复习变成每天可执行的任务</h2>
+            <p>输入目标、资料和时间，系统会生成今日计划、考点、卡片、自测题和晚间复盘。</p>
+          </div>
+          <button id="resetToday" class="ghost-btn">重置今日完成状态</button>
+        </div>
+
+        <div class="grid two">
+          <form id="goalForm" class="panel">
+            <h3>备考目标</h3>
+            <label>目标考试
+              <input id="goalName" placeholder="例如：英语四级 + 计算机网络期末" />
+            </label>
+            <label>考试日期
+              <input id="examDate" type="date" />
+            </label>
+            <label>今天可用学习时间（分钟）
+              <input id="dailyMinutes" type="number" min="20" step="10" value="90" />
+            </label>
+            <label>科目/模块，用逗号分隔
+              <input id="subjects" placeholder="四级单词, 四级阅读, 计算机网络, Python" />
+            </label>
+            <button type="submit" class="primary-btn">生成今日计划</button>
+          </form>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>今日任务</h3>
+              <span id="progressText" class="muted">0/0</span>
+            </div>
+            <div id="todayPlan" class="task-list empty">还没有任务。先填写左侧目标。</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>今日学习节奏建议</h3>
+          <div class="strategy-list">
+            <div><strong>先测后学</strong><span>先做 3 道题暴露问题，再回去看资料。</span></div>
+            <div><strong>25 分钟一轮</strong><span>一轮只解决一个小问题，避免空耗。</span></div>
+            <div><strong>输出检查</strong><span>学完用自己的话解释，解释不清就说明没掌握。</span></div>
+            <div><strong>错题入库</strong><span>错题不是失败，是下一轮复习的导航。</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="materials" class="view">
+        <div class="view-header">
+          <div>
+            <span class="eyebrow">资料驱动</span>
+            <h2>粘贴课件、真题、笔记，生成考点</h2>
+          </div>
+          <button id="sampleMaterial" class="ghost-btn">填入示例资料</button>
+        </div>
+
+        <div class="grid two">
+          <div class="panel">
+            <h3>学习资料</h3>
+            <textarea id="materialInput" rows="18" placeholder="粘贴四级真题、听力原文、老师 PPT 文本、期末复习提纲……"></textarea>
+            <div class="button-row">
+              <button id="generateKeypoints" class="primary-btn">生成考点</button>
+              <button id="generateCards" class="secondary-btn">生成卡片</button>
+              <button id="generateQuiz" class="secondary-btn">生成自测题</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>考点输出</h3>
+              <button id="copyKeypoints" class="mini-btn">复制</button>
+            </div>
+            <div id="keypointsOutput" class="markdown-box empty">还没有考点。</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="cards" class="view">
+        <div class="view-header">
+          <div>
+            <span class="eyebrow">间隔重复</span>
+            <h2>把考点变成主动回忆卡片</h2>
+          </div>
+          <button id="clearCards" class="ghost-btn danger">清空卡片</button>
+        </div>
+
+        <div class="grid two">
+          <div class="panel">
+            <h3>新增卡片</h3>
+            <label>问题
+              <input id="cardQuestion" placeholder="例如：ARP 的作用是什么？" />
+            </label>
+            <label>答案
+              <textarea id="cardAnswer" rows="5" placeholder="用自己的话写答案。"></textarea>
+            </label>
+            <button id="addCard" class="primary-btn">添加卡片</button>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>今日到期卡片</h3>
+              <span id="dueCount" class="muted">0 张</span>
+            </div>
+            <div id="reviewCard" class="review-card empty">暂无到期卡片。可以从资料页生成。</div>
+            <div id="reviewActions" class="button-row hidden">
+              <button data-rating="again" class="secondary-btn">忘了</button>
+              <button data-rating="hard" class="secondary-btn">勉强</button>
+              <button data-rating="good" class="primary-btn">记住</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>全部卡片</h3>
+          <div id="cardList" class="card-list empty">还没有卡片。</div>
+        </div>
+      </section>
+
+      <section id="quiz" class="view">
+        <div class="view-header">
+          <div>
+            <span class="eyebrow">主动回忆</span>
+            <h2>先测试，再学习</h2>
+          </div>
+          <button id="clearQuiz" class="ghost-btn danger">清空题目</button>
+        </div>
+        <div id="quizList" class="quiz-list empty">暂无题目。请到资料页生成自测题。</div>
+      </section>
+
+      <section id="review" class="view">
+        <div class="view-header">
+          <div>
+            <span class="eyebrow">晚间复盘</span>
+            <h2>把今天的问题变成明天的计划</h2>
+          </div>
+          <button id="exportData" class="ghost-btn">导出数据</button>
+        </div>
+
+        <div class="grid two">
+          <form id="reviewForm" class="panel">
+            <h3>复盘记录</h3>
+            <label>今天完成了什么？
+              <textarea id="doneToday" rows="4"></textarea>
+            </label>
+            <label>卡在哪里？
+              <textarea id="stuckToday" rows="4"></textarea>
+            </label>
+            <label>明天最小行动
+              <textarea id="tomorrowAction" rows="4" placeholder="例如：只做一篇四级阅读并分析错因。"></textarea>
+            </label>
+            <button class="primary-btn" type="submit">保存复盘</button>
+          </form>
+
+          <div class="panel">
+            <h3>历史复盘</h3>
+            <div id="reviewHistory" class="history-list empty">暂无复盘。</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="settings" class="view">
+        <div class="view-header">
+          <div>
+            <span class="eyebrow">可选</span>
+            <h2>接入 OpenAI 兼容接口</h2>
+            <p>不填也能用本地规则生成。填入后可让 AI 生成更自然的计划、考点和题目。</p>
+          </div>
+        </div>
+
+        <form id="settingsForm" class="panel narrow">
+          <label>API Endpoint
+            <input id="apiEndpoint" placeholder="例如：https://api.openai.com/v1/chat/completions" />
+          </label>
+          <label>模型名
+            <input id="apiModel" placeholder="例如：gpt-4o-mini / deepseek-chat / glm-4-flash" />
+          </label>
+          <label>API Key
+            <input id="apiKey" type="password" placeholder="仅保存在本机 localStorage，公开部署时不要填写真实 Key" />
+          </label>
+          <div class="notice">
+            <strong>安全提示：</strong>浏览器前端无法真正隐藏 API Key。正式项目应改成“前端 → 后端 → AI API”。
+          </div>
+          <div class="button-row">
+            <button class="primary-btn" type="submit">保存设置</button>
+            <button id="clearSettings" class="secondary-btn" type="button">清空设置</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
